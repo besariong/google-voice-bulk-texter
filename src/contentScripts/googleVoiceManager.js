@@ -126,6 +126,7 @@ class GoogleVoiceSiteManager {
 	}
 
 	confirmChatSwitched() {
+		return true;
 		const numberToSend = this.currentNumberSending;
 		const recipientButton = document.querySelector(selectors.gvRecipientButton);
 		if (recipientButton && recipientButton.offsetParent !== null) {
