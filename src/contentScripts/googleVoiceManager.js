@@ -130,9 +130,11 @@ class GoogleVoiceSiteManager {
 		const recipientButton = document.querySelector(selectors.gvRecipientButton);
 		if (recipientButton && recipientButton.offsetParent !== null) {
 			const label = recipientButton.getAttribute('aria-label');
-			if (label && label.replaceAll(' ','').indexOf(numberToSend) >=0)
+			if (label && label.replaceAll(' ','').indexOf(numberToSend) >= 0) {
 				return true;
+			}
 		}
+
 		return false;
 	}
 
