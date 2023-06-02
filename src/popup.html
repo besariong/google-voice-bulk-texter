@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Google Voice Bulk Texter Popup</title>
+		<title>Bulk Texter Lite Popup</title>
 		<link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
 		<style type="text/css">
 			body#popup-body {
@@ -66,13 +66,18 @@
 				margin-bottom: 0;
 			}
 
-			#wrong-page-message a:focus {
-				outline: 0;
+			div.bulk-texter-pro-text {
+				text-align: center;
+				font-style: italic;
+				border-top: 1px solid #ccc;
+    		padding-top: 8px;
+			}
+			div.bulk-texter-pro-text img {
+				width: 24px;
 			}
 
-			#hangouts-beta-warning {
-				display: none;
-				white-space: initial;
+			#wrong-page-message a:focus {
+				outline: 0;
 			}
 
 			#support-info {
@@ -90,7 +95,7 @@
 	</head>
 
 	<body id="popup-body">
-		<h1>Google Voice Bulk Texter</h1>
+		<h1>Bulk Texter Lite</h1>
 		<div id="loading-screen">
 			Loading...
 		</div>
@@ -121,14 +126,9 @@
 				<label name="gv-tos">
 					<input id="gv-tos-agreement" type="checkbox" name="gv-tos" />
 					<div class="tos-text">
-						I have read the Google Voice <a target="blank" href="https://support.google.com/voice/answer/9230450?hl=en&ref_topic=9273222">Acceptable Use Policy</a> and accept full responsibity for my use of this extension.
+						I have read and accept the Bulk Texter Lite <a target="blank" href="https://www.bulktexterpro.com/docs/terms/terms-of-use">Terms of Use</a>.
 					</div>
 				</label>
-			</div>
-			<div id="hangouts-beta-warning">
-				<p>
-					Support for messaging via Hangouts is in beta. For the best experience, use this extension on <a href="https://voice.google.com" target="_blank">voice.google.com</a>.
-				</p>
 			</div>
 			<div class="input-group">
 				<button class="btn btn-success" id="send-messages-button" title="Pressing this will send the composed message to all of the listed contacts.">Send Messages</button>
@@ -149,12 +149,14 @@
 				<ul>
 					<li>Make sure you are currently on
 						<a href="https://voice.google.com/messages" target="_blank">Google Voice</a>
-						or <a href="https://hangouts.google.com" target="_blank">Google Hangouts</a>
 					</li>
 					<li>Try refreshing the page</li>
 					<li>If it still isn't working for you, see additional troubleshooting tips <a href="https://github.com/brismuth/google-voice-bulk-texter/blob/main/support.md" target="_blank">here</a></li>
 				</ul>
 			</div>
+		</div>
+		<div class="bulk-texter-pro-text">
+			Want more features? Check out <a target="blank" href="https://www.bulktexterpro.com/">Bulk Texter Pro <img src="https://www.bulktexterpro.com/img/logo.svg" alt="Bulk Texter Pro Logo"></a> !
 		</div>
 	</body>
 	<script src="popup.js"></script>

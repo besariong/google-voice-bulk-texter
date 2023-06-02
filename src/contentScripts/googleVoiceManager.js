@@ -20,9 +20,6 @@ class GoogleVoiceSiteManager {
 				this.addMessagesToQueue(message.messages);
 				this.sendInterval = message.sendInterval;
 
-				// switch To Text View
-				document.querySelector(selectors.gvMessagesTab).click();
-
 				this.sendFromQueue();
 			}
 
@@ -40,7 +37,6 @@ class GoogleVoiceSiteManager {
 
 	async sendFromQueue() {
 		let retryCount = 5;
-		let verifyOnly = false;
 
 		if (this.numberQueue.length > 0) {
 			this.currentNumberSending = this.numberQueue.shift();
@@ -48,20 +44,15 @@ class GoogleVoiceSiteManager {
 			let sendExecutionQueue = this.getSendExecutionQueue();
 			while (sendExecutionQueue.length) {
 				let currentStep = sendExecutionQueue.shift().bind(this);
-				const result = await keepTryingAsPromised(currentStep, retryCount > 0);
-				if (!result) {
-					console.log(`Bulk SMS - Step failed (${getFunctionName(currentStep)}), retrying message.`);
-					retryCount--; // if this keeps happening, alert on it
-
-					if (verifyOnly) {
-						sendExecutionQueue = this.getVerificationOnlyExecutionQueue();
-					} else {
-						// otherwise start over in the execution queue
-						sendExecutionQueue = this.getSendExecutionQueue();
-					}
-				}
+				const result = await keepTrying(currentStep, retryCount > 0);
 				if (getFunctionName(currentStep) === 'sendMessage') {
-					verifyOnly = true; // we don't want to risk sending a message twice
+					// we only try the sendMessage step once, no matter the result, to avoid the chance of duplicate messages.
+					sendExecutionQueue.length = 0; // reset the send queue
+					setTimeout(this.sendFromQueue.bind(this), this.sendInterval); // continue with next message
+				} else if (!result) { // retry
+					console.log(`Bulk Texter Lite - Step failed (${getFunctionName(currentStep)}), retrying message.`);
+					retryCount--; // if this keeps happening, alert on it
+					sendExecutionQueue = this.getSendExecutionQueue();
 				}
 			}
 		}
@@ -69,26 +60,22 @@ class GoogleVoiceSiteManager {
 
 	getSendExecutionQueue() {
 		return [
+			this.switchToMessagesTab,
 			this.showNumberInput,
 			this.fillNumberInput,
 			this.startChat,
 			this.confirmChatSwitched,
 			this.writeMessage,
-			this.sendMessage,
-			this.confirmThreadHeaderUpdated,
-			this.confirmSent
+			this.sendMessage
 		];
 	}
 
-	// opens up the chat again and checks if the message was sent previously
-	getVerificationOnlyExecutionQueue() {
-		return [
-			this.showNumberInput,
-			this.fillNumberInput,
-			this.startChat,
-			this.confirmChatSwitched,
-			this.confirmSent
-		];
+	switchToMessagesTab() {
+		const messagesTabButton = document.querySelector(selectors.gvMessagesTab);
+		if (messagesTabButton) {
+			messagesTabButton.click();
+		} 
+		return true;
 	}
 
 	showNumberInput() {
@@ -103,12 +90,7 @@ class GoogleVoiceSiteManager {
 		let numInput = document.querySelector(selectors.gvNumInput);
 		if (numInput && numInput.offsetParent !== null) {
 			numInput.value = this.currentNumberSending;
-
-			// this fires the necessary events for Google Voice to pick up
-			numInput.focus();
-			numInput.select();
-			document.execCommand('cut');
-			document.execCommand('paste');
+			simulateKeyPress(numInput);
 
 			// confirm that the number was added as expected
 			let numInputConfirm = document.querySelector(selectors.gvNumInput);
@@ -160,14 +142,7 @@ class GoogleVoiceSiteManager {
 			return;
 		}
 
-		messageEditor.focus();
-		if (messageEditor.select) {
-			messageEditor.select();
-		} else {
-			document.execCommand('selectAll',false,null)
-		}
-		document.execCommand('cut');
-		document.execCommand('paste');
+		simulateKeyPress(messageEditor);
 
 		// click send button
 		let sendButtonOld = document.querySelector(selectors.gvSendButtonOld);
@@ -181,41 +156,6 @@ class GoogleVoiceSiteManager {
 			sendButtonNew.dispatchEvent(new Event('mouseup'));
 			sendButtonNew.click();
 			return true;
-		}
-	}
-
-	confirmThreadHeaderUpdated() {
-		let chatLoadedHeader = document.querySelector(selectors.gvChatLoadedHeader); // the header switches to this after sending is complete. If we move on before this, it can break things.
-		if (chatLoadedHeader) {
-			return true;
-		}
-	}
-
-	confirmSent() {
-		let sendingNote = document.querySelector(selectors.gvSendingNote); // this is the note that says "Sending", it will disappear when it is finished
-
-		if (!sendingNote) {
-			// check if the message we sent is showing up in the chat window
-			let mostRecentMessages = document.querySelectorAll(selectors.gvMostRecentMessages);
-			let	sentMessageIsThreaded = false;
-			if (mostRecentMessages && mostRecentMessages.length) {
-				var i = mostRecentMessages.length - 1;
-				for (i; !sentMessageIsThreaded && i >= 0; i--) {
-					let messageIntended = removeWhitespace(removeUnicode(this.messagesToSend[this.currentNumberSending]));
-					let messageSent = removeWhitespace(removeUnicode(mostRecentMessages[mostRecentMessages.length - 1].innerText));
-					sentMessageIsThreaded = messageSent === messageIntended;
-				}
-			}
-
-			if (sentMessageIsThreaded) {
-				logEvent({
-					eventLabel: 'MESSAGE_SENT',
-					eventValue: 1
-				});
-				// continue with queue
-				setTimeout(this.sendFromQueue.bind(this), this.sendInterval);
-				return true;
-			}
 		}
 	}
 }

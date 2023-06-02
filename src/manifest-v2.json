@@ -1,43 +1,29 @@
 {
   "manifest_version": 2,
 
-  "name": "Google Voice Bulk Texter",
+  "name": "Bulk Texter Lite",
 
   "short_name": "Bulk Texter",
 
-  "description": "Send personalized bulk SMS messages via Google Voice.",
+  "description": "Send personalized bulk SMS text messages via Google Voice. This software is not affiliated with Google or Google Voice.",
 
-  "version": "2.0.5",
+  "version": "2.1.4",
 
   "background": {
     "scripts": ["background.js"]
   },
 
   "browser_action": {
-    "default_title": "Bulk SMS",
+    "default_title": "Bulk Texter Lite",
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
 
   "content_scripts": [
     {
-      "matches": ["https://hangouts.google.com/webchat/*"],
-      "js": [
-        "contentScripts/hangoutsListViewManager.js",
-        "contentScripts/hangoutsThreadViewManager.js"
-      ],
-      "all_frames": true
-    },
-    {
       "matches": ["https://voice.google.com/*"],
       "js": [
-        "contentScripts/googleVoiceManager.js"
-      ],
-      "all_frames": true
-    },
-    {
-      "matches": ["https://hangouts.google.com/webchat/*", "https://voice.google.com/*"],
-      "js": [
+        "contentScripts/googleVoiceManager.js",
         "contentScripts/tools.js",
         "contentScripts/main.js"
       ],
@@ -49,8 +35,6 @@
              "128": "icon.png" },
 
   "permissions": [
-    "clipboardWrite",
-    "clipboardRead",
     "storage"
   ]
 }

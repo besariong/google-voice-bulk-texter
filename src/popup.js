@@ -6,52 +6,56 @@ if (chrome == null) {
 const defaultSendInterval = 3;
 const sendIntervalOptions = [
 	{
-		delay: 500,
-		label: '1/2 second (may be unstable)'
+		delay: 5 * 1000,
+		label: '5 seconds <br/>(more prone to rate limiting)'
 	},
 	{
-		delay: 1000,
-		label: '1 second (may be unstable)'
+		delay: 10 * 1000,
+		label: '10 seconds <br/>(more prone to rate limiting)'
 	},
 	{
-		delay: 2000,
-		label: '2 seconds'
+		delay: 15 * 1000,
+		label: '15 seconds <br/>(more prone to rate limiting)'
 	},
 	{
-		delay: 5000,
-		label: '5 seconds'
-	},
-	{
-		delay: 10000,
-		label: '10 seconds'
-	},
-	{
-		delay: 15000,
-		label: '15 seconds'
-	},
-	{
-		delay: 30000,
+		delay: 30 * 1000,
 		label: '30 seconds'
 	},
 	{
-		delay: 45000,
+		delay: 45 * 1000,
 		label: '45 seconds'
 	},
 	{
-		delay: 60000,
+		delay: 60 * 1000,
 		label: '1 minute'
 	},
 	{
-		delay: 120000,
+		delay: 1.5 * 60 * 1000,
+		label: '1.5 minutes'
+	},
+	{
+		delay: 2 * 60 * 1000,
 		label: '2 minutes'
 	},
 	{
-		delay: 300000,
+		delay: 3 * 60 * 1000,
+		label: '3 minutes'
+	},
+	{
+		delay: 4 * 60 * 1000,
+		label: '4 minutes'
+	},
+	{
+		delay: 5 * 60 * 1000,
 		label: '5 minutes'
 	},
 	{
-		delay: 600000,
+		delay: 10 * 60 * 1000,
 		label: '10 minutes'
+	},
+	{
+		delay: 15 * 60 * 1000,
+		label: '15 minutes'
 	}
 ];
 
@@ -62,7 +66,7 @@ const tosAgreement = document.getElementById('gv-tos-agreement');
 const sendIntervalSlider = document.getElementById('send-interval-slider');
 
 /**
- * Sends message to the content script to search for the hangouts elements and send messages
+ * Sends message to the content script to search for the google voice elements and send messages
  */
 function sendMessages(messages, sendInterval) {
 	if (!messages) {
@@ -158,7 +162,7 @@ function simplifyNumber(number) {
 }
 
 /**
- * uses the chrome tabs API to check if the curren tab is hangouts
+ * uses the chrome tabs API to check if the current tab is google voice
  * @return {[type]} [description]
  */
 function currentlyOnSupportedTab(cb) {
@@ -227,17 +231,11 @@ function showVersionNumber() {
 
 /**
  * hides the spinner and shows the relevant UI
- * @param  {string} supportLevel 	'GV', 'HANGOUTS', or false
+ * @param  {string} supportLevel 	'GV', or false
  */
 function showUI(supportLevel) {
-	if (supportLevel) {
+	if (supportLevel === 'GV') {
 		document.getElementById('ui-wrapper').style.display = 'block';
-		if (supportLevel === 'HANGOUTS') {
-			sendMessagesButton.innerText = 'Prepare Messages';
-			sendMessagesButton.title = 'This will not send messages - it will just get them ready.';
-			document.getElementById('hangouts-beta-warning').style.display = 'block';
-			document.getElementById('send-interval-block').style.display = 'none';
-		}
 	} else {
 		document.getElementById('wrong-page-message').style.display = 'block';
 		document.getElementById('popup-body').style['min-height'] = '180px';
